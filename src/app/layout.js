@@ -1,7 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Inter_Tight } from "next/font/google"; 
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter_Tight({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Create Next App",
