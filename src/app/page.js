@@ -1,18 +1,13 @@
+"use client"
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Header from "@/components/Header";
 
 export default function Home() {
   return (
     <main className="pb-10 bg-image h-screen lg:px-0 px-5">
-      <div className="max-w-6xl mx-auto py-5 flex items-center justify-start">
-        <div className="">
-          <span className="font-bold text-2xl">saascribe</span>
-        </div>
-        {/* <div>
-          <Button>Get Started</Button>
-        </div> */}
-      </div>
+      <Header />
       <div className="lg:pt-48 pt-24 space-y-5">
         <div className="flex items-center justify-center max-w-6xl mx-auto">
           <span className="lg:text-6xl text-3xl font-semibold max-w-3xl text-center">

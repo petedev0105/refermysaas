@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Inter_Tight } from "next/font/google"; 
+import { Inter_Tight } from "next/font/google";
+import { SupabaseProvider } from "@/utils/SupabaseProvider";
 
 const inter = Inter_Tight({ subsets: ["latin"] });
 
