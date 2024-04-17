@@ -34,13 +34,13 @@ function DashboardComponent({ user }) {
     setStoreSelected(false);
   }
 
-  async function addApiKeyToSupabase() {
+  async function addApiKeyToSupabase(apiKey) {
     const insertData = {
-      user_api_key: apiKeyInput,
+      user_api_key: apiKey,
       user_id: user.id,
       user_email: user.email,
     };
-    const { data, error } = await supabase.from("api_keys").insert(insertData);
+    const { data, error } = await supabase.from("api_keys").upsert(insertData).eq({"user_id": user.id});
 
     if (!error) {
       console.log(data);
@@ -136,6 +136,7 @@ function DashboardComponent({ user }) {
       {activePage == "settings" && (
         <div className="space-y-5 pt-10">
           <Settings
+            addApiKeyToSupabase={addApiKeyToSupabase}
             handleGetLemonSqueezyData={handleGetLemonSqueezyData}
             apiKey={apiKey}
             setApiKey={setApiKey}
@@ -160,7 +161,7 @@ function DashboardComponent({ user }) {
                 placeholder="Your LemonSqueezy API Key..."
               />
               <button
-                onClick={() => addApiKeyToSupabase()}
+                onClick={() => addApiKeyToSupabase(apiKeyInput)}
                 className="px-3 py-2 bg-indigo-500 text-white rounded-md hover:opacity-85 w-1/3"
               >
                 Connect store

@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 
-function Settings({ apiKey, setApiKey, handleGetLemonSqueezyData }) {
+function Settings({ apiKey, setApiKey, handleGetLemonSqueezyData, addApiKeyToSupabase}) {
   const [userApiKey, setUserApiKey] = useState("");
   const { toast } = useToast();
 
@@ -13,7 +13,10 @@ function Settings({ apiKey, setApiKey, handleGetLemonSqueezyData }) {
       console.log(userApiKey);
       var key = userApiKey;
       setApiKey(key);
-      handleGetLemonSqueezyData(key);
+
+      addApiKeyToSupabase(userApiKey);
+
+      // handleGetLemonSqueezyData(key);
 
       toast({
         title: "Saved API Key!",
