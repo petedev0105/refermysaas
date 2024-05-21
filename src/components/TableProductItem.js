@@ -5,6 +5,10 @@ import { Button } from "./ui/button";
 import { ColorPicker } from "antd";
 import { useState } from "react";
 import SkeletonInput from "antd/es/skeleton/Input";
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/components/ui/use-toast"
+
+
 
 function TableProductItem({
   tableProduct,
@@ -15,17 +19,24 @@ function TableProductItem({
   isHighlighted,
   color,
   onAddFeature,
+  setPreviewTableData
 }) {
   const [newFeature, setNewFeature] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [features, setFeatures] = useState([]);
+  const { toast } = useToast()
 
   const addFeature = () => {
     if (inputValue !== "") {
       setFeatures((prevFeatures) => [...prevFeatures, inputValue]);
-      onAddFeature(tableProduct.id, inputValue);
+      onAddFeature(tableProduct.id, inputValue, tableProduct);
       console.log(tableProduct.id, inputValue);
       setInputValue("");
+
+      toast({
+        title: "Feature added!",
+        description: `Added new feature to ${tableProduct.attributes.name}`,
+      })
     }
   };
 
@@ -35,7 +46,8 @@ function TableProductItem({
     }
   };
   return (
-    <div key={index} className="p-7 border-2 rounded-xl bg-white space-y-7">
+    
+    <><div key={index} className="p-7 border-2 rounded-xl bg-white space-y-7">
       <div className="space-y-2">
         <div>
           <span className="font-semibold text-lg">
@@ -53,7 +65,8 @@ function TableProductItem({
           <span className="text-sm font-semibold">Features</span>
         </div>
 
-        {features && features.length > 0 ? (
+        <div className="pb-3 space-y-2">
+          {features && features.length > 0 ? (
           features.map((feature, index) => (
             <div key={index} className="p-2 border rounded-md shadow-sm">
               <span className="text-sm">{feature}</span>
@@ -64,6 +77,9 @@ function TableProductItem({
             Features will be listed here when added.
           </span>
         )}
+        </div>
+
+        
 
         <div className="flex items-center space-x-2">
           <Input
@@ -80,7 +96,7 @@ function TableProductItem({
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 border-t pt-5">
         <div>
           <span className="text-sm font-semibold">Customization</span>
         </div>
@@ -106,16 +122,16 @@ function TableProductItem({
           </div>
         </div>
       </div>
-      <div>
+      {/* <div>
         <div>
           <span className="text-sm font-medium">CTA Button Text</span>
         </div>
         <div className="flex items-center space-x-2">
-          <Input placeholder="Add feature name..." value={"Get Started"} />
+          <Input placeholder="Add feature name, press enter to save." value={"Get Started"} />
           <Button>Save</Button>
         </div>
-      </div>
-    </div>
+      </div> */}
+    </div><Toaster /></>
   );
 }
 

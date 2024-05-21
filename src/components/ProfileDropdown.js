@@ -13,10 +13,11 @@ function ProfileDropdown({ user, setActivePage }) {
     <div>
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <img
+          {/* <img
             className="rounded-full h-10 w-10"
             src={user.identities[0].identity_data.picture}
-          />
+          /> */}
+          <span className="px-2 py-1 rounded-md hover:bg-stone-100">{user.email}</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>

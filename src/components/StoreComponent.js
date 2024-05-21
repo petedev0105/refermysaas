@@ -19,6 +19,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import SelectRadio from "./SelectRadio";
 import ProductCard from "./productCard";
+import { useRouter } from "next/navigation";
 
 function StoreComponent({ index, handleDeselectStore, user, apiKey }) {
   const [store, setStore] = useState(null);
@@ -29,6 +30,7 @@ function StoreComponent({ index, handleDeselectStore, user, apiKey }) {
   const [pricingTables, setPricingTables] = useState([]);
   const [tableNameInput, setTableNameInput] = useState("");
   const { toast } = useToast();
+  const router = useRouter();
 
   async function fetchStoreData() {
     const apiUrl = `https://api.lemonsqueezy.com/v1/stores/${index}`;
@@ -136,6 +138,10 @@ function StoreComponent({ index, handleDeselectStore, user, apiKey }) {
           description: "You can now start editing your table.",
         });
         fetchPricingTables();
+
+        if (router.isReady) {
+          router.push(`/table-editing/${tableId}`);
+        }
       }
 
       // console.log(selectedProducts)
@@ -150,6 +156,23 @@ function StoreComponent({ index, handleDeselectStore, user, apiKey }) {
   // handleSetProducts() {
   //   if()
   // }
+
+  async function handleDeleteTable(tableId) {
+    const {data, error} = await supabase
+    .from("pricing_tables")
+    .delete()
+    .eq("table_id", tableId);
+
+    if(!error) {
+      fetchPricingTables();
+      toast({
+        title: "Deleted table!",
+        description: "The table has been deleted."
+      })
+      
+    }
+    
+  }
 
   useEffect(() => {
     fetchPricingTables();
@@ -174,7 +197,7 @@ function StoreComponent({ index, handleDeselectStore, user, apiKey }) {
                   alt="Store Avatar"
                 />
                 <div className="pt-5">
-                  <span className="font-medium text-lg">{store.name}</span>
+                  <span className="font-medium text-2xl">{store.name}</span>
                 </div>
                 <div>
                   <span className="text-sm">{store.url}</span>
@@ -259,24 +282,41 @@ function StoreComponent({ index, handleDeselectStore, user, apiKey }) {
             {pricingTables && pricingTables.length > 0 && (
               <div className="grid grid-cols-3 gap-5">
                 {pricingTables.map((pricingTable, index) => (
-                  <Link
-                    // target="_blank"
-                    key={index}
-                    href={`/table-editing/${pricingTable.table_id}`}
-                  >
-                    <div className="flex items-center space-x-3 bg-white rounded-md border p-3 cursor-pointer hover:bg-slate-50">
-                    <img
-                  src={store.avatar_url}
-                  className="h-10 w-10 rounded-md bg-stone-200 border"
-                  alt="Store Avatar"
-                />
-                      <div>
-                        <span className="font-medium">
-                          {pricingTable.table_name}
+                  <div key={index} className="bg-white rounded-md border p-3 cursor-pointer0 space-y-3 shadow-sm">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={store.avatar_url}
+                        className="h-7 w-7 rounded-md bg-stone-200 border"
+                        alt="Store Avatar"
+                      />
+                      <div className="w-2/3 line-clamp-1 text-elipsis">
+                        <span className="font-medium ">
+                          {pricingTable.table_name}{" "}
                         </span>
                       </div>
                     </div>
-                  </Link>
+
+                    <div className="flex items-center justify-end space-x-2 border-t pt-5">
+                      <div>
+                        <Link
+                          // target="_blank"
+                          key={index}
+                          href={`/table-editing/${pricingTable.table_id}`}
+                        >
+                          <button className="text-sm font-medium px-3 py-1 rounded-md hover:bg-stone-50 border">
+                            View table
+                          </button>{" "}
+                        </Link>
+                      </div>
+                      <div className="">
+                        <img
+                          onClick={() => handleDeleteTable(pricingTable.table_id)}
+                          src="/img/Trash.svg"
+                          className="h-9 w-9 hover:bg-stone-100 rounded-md cursor-pointer p-2"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}

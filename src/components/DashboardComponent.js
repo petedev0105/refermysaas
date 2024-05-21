@@ -140,6 +140,7 @@ function DashboardComponent({ user }) {
             handleGetLemonSqueezyData={handleGetLemonSqueezyData}
             apiKey={apiKey}
             setApiKey={setApiKey}
+            user={user}
           />
         </div>
       )}

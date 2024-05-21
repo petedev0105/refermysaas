@@ -44,6 +44,8 @@ function TableEditing({ params }) {
     }
   }
 
+  
+
   useEffect(() => {
     checkUser();
   }, []);

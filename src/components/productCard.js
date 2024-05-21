@@ -14,7 +14,7 @@ function ProductCard({
       key={index}
       className="hover:bg-slate-50 flex items-center w-full justify-between border-b w-full px-3 py-2 cursor-pointer"
     >
-      <div className="">
+      <div className="w-2/3">
         <div className="">
           <span className="text-xs font-medium">{product.attributes.name}</span>
         </div>

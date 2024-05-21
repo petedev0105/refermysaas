@@ -4,7 +4,13 @@ import { Button } from "./ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 
-function Settings({ apiKey, setApiKey, handleGetLemonSqueezyData, addApiKeyToSupabase}) {
+function Settings({
+  apiKey,
+  setApiKey,
+  handleGetLemonSqueezyData,
+  addApiKeyToSupabase,
+  user,
+}) {
   const [userApiKey, setUserApiKey] = useState("");
   const { toast } = useToast();
 
@@ -33,20 +39,29 @@ function Settings({ apiKey, setApiKey, handleGetLemonSqueezyData, addApiKeyToSup
   }, []);
 
   return (
-    <div className="">
+    <div className="space-y-7">
       <Toaster />
-      <div className="flex items-center justify-between pb-5">
+      <div className="flex items-center justify-between">
         <span className="font-semibold text-2xl">Settings</span>
       </div>
-      <span className="text-sm font-medium">Lemon Squeezy API Key</span>
-      <div className="flex items-center space-x-2 pt-2">
-        <Input
-          value={userApiKey}
-          onChange={(e) => setUserApiKey(e.target.value)}
-          placeholder="Your LemonSqueezy API Key..."
-          className="w-1/2"
-        />
-        <Button onClick={() => handleConnectApiKey()}>Save</Button>
+      <div>
+        <span className="text-sm font-semibold">Email</span>
+        <div className="flex items-center space-x-2 pt-2">
+          <span>{user.email}</span>
+          {/* <Button onClick={() => handleConnectApiKey()}>Save</Button> */}
+        </div>
+      </div>
+      <div>
+        <span className="text-sm font-semibold">Lemon Squeezy API Key</span>
+        <div className="flex items-center space-x-2 pt-2">
+          <Input
+            value={userApiKey}
+            onChange={(e) => setUserApiKey(e.target.value)}
+            placeholder="Your LemonSqueezy API Key..."
+            className="w-1/2"
+          />
+          <Button onClick={() => handleConnectApiKey()}>Save</Button>
+        </div>
       </div>
     </div>
   );

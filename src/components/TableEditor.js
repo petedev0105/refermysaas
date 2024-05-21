@@ -20,6 +20,8 @@ function TableEditor({ user, tableId, tableData }) {
   const [highlightedProducts, setHighlightedProducts] = useState([]);
   const [productFeatures, setProductFeatures] = useState([]);
 
+  const [previewTableData, setPreviewTableData] = useState(null);
+
   function parseTableCards() {
     let parsedProductsArr = [];
     const tableProductsArr = tableData.table_cards;
@@ -28,8 +30,21 @@ function TableEditor({ user, tableId, tableData }) {
       parsedProductsArr.push(parsedTableProduct);
     });
 
-    console.log(parsedProductsArr);
+    console.log("parsed products arr:", parsedProductsArr);
     setTableProducts(parsedProductsArr);
+  }
+
+  function parseTablePreviewCards() {
+    let parsedProductsArr = [];
+    const tableProductsArr = tableData.table_preview_cards;
+    tableProductsArr.map((tableProduct) => {
+      let parsedTableProduct = JSON.parse(tableProduct);
+      parsedProductsArr.push(parsedTableProduct);
+    });
+
+    console.log("parsed preview products arr:", parsedProductsArr);
+    // setTableProducts(parsedProductsArr);
+    setVisibleProducts(parsedProductsArr)
   }
 
   // async function handleAddFeature() {}
@@ -40,44 +55,143 @@ function TableEditor({ user, tableId, tableData }) {
 
   function handleSetProductVisible() {}
 
-  function handleSaveTable() {
+  const { toast } = useToast();
+
+  async function handleSaveTable() {
     if (visibleProducts && visibleProducts.length > 0) {
-      console.log(visibleProducts);
+      // console.log("features:", productFeatures);
+      // console.log("visible products:", visibleProducts);
+
+      let tempProducts = visibleProducts;
+      let tempProductFeatures = productFeatures;
+
+      // console.log(tempProducts, tempProductFeatures);
+
+      // Update features based on the second array
+      const updatedArray = tempProducts.map((item) => {
+        if (tempProductFeatures[item.id]) {
+          return { ...item, features: tempProductFeatures[item.id] };
+        }
+        return item;
+      });
+
+      console.log(updatedArray);
+
+      const { data, error } = await supabase
+        .from("pricing_tables")
+        .update({ table_preview_cards: updatedArray, table_color: color })
+        .eq("table_id", tableId);
+
+        toast({
+          title: "Saved table data!",
+        });
+
+      if (!error) {
+        console.log("updated table to supabase!");
+      }
     }
   }
 
   function handleChangeColor(value) {
     setColor(value);
     console.log(value);
+
+    const { data, error } = supabase.from("").insert("");
   }
 
-  function handleProductVisibilityToggle(product) {
-    console.log(product);
+  function handleProductVisibilityToggle(product, index) {
+    console.log(index);
+
+    // The object that filters out the core product data
+    const visibleProductObject = {
+      id: product.id,
+      name: product.attributes.name,
+      price: product.attributes.price,
+      features: [],
+      payment_link: product.attributes.buy_now_url,
+    };
+
     const isVisible = visibleProducts.some(
-      (visibleProduct) => visibleProduct.id === product.id
+      (visibleProduct) => visibleProduct.id === visibleProductObject.id
     );
 
     if (isVisible) {
       setVisibleProducts((prevVisibleProducts) =>
         prevVisibleProducts.filter(
-          (visibleProduct) => visibleProduct.id !== product.id
+          (visibleProduct) => visibleProduct.id !== visibleProductObject.id
         )
       );
+
+      const visibleProductsTemp = [];
+
+      const filteredProducts = visibleProducts.filter(
+        (visibleProduct) => visibleProduct.id !== visibleProductObject.id
+      );
+
+      visibleProductsTemp.push(filteredProducts);
+
+      console.log("visible products", visibleProductsTemp);
     } else {
       setVisibleProducts((prevVisibleProducts) => [
         ...prevVisibleProducts,
-        product,
+        visibleProductObject,
       ]);
+
+      const visibleProductsTemp = [...visibleProducts, visibleProductObject];
+      console.log("visible products", visibleProductsTemp);
     }
   }
 
-  function handleAddFeature(productId, newFeature) {
+  function handleAddFeature(productId, newFeature, product) {
     setProductFeatures((prevProductFeatures) => ({
       ...prevProductFeatures,
       [productId]: [...(prevProductFeatures[productId] || []), newFeature],
     }));
 
     console.log(productId, newFeature);
+
+    let featuresTemp = [productFeatures];
+
+    featuresTemp.push(newFeature);
+
+    const visibleProductObject = {
+      id: product.id,
+      name: product.attributes.name,
+      price: product.attributes.price,
+      features: featuresTemp,
+      payment_link: product.attributes.buy_now_url,
+    };
+
+    console.log("product object with updated feature:", visibleProductObject);
+
+    if (productFeatures.length > 0) {
+      console.log("no feature");
+      // const featuresTemp = [...productFeatures, newFeature];
+
+      // const visibleProductObject = {
+      //   id: product.id,
+      //   name: product.attributes.name,
+      //   price: product.attributes.price,
+      //   features: featuresTemp,
+      //   payment_link: product.attributes.buy_now_url,
+      // };
+
+      // console.log("product object with updated feature:", visibleProductObject);
+    } else {
+      console.log("has feature");
+      // const featuresTemp = [];
+      // featuresTemp.push(newFeature);
+
+      // const visibleProductObject = {
+      //   id: product.id,
+      //   name: product.attributes.name,
+      //   price: product.attributes.price,
+      //   features: featuresTemp,
+      //   payment_link: product.attributes.buy_now_url,
+      // };
+
+      // console.log("product object with updated feature:", visibleProductObject);
+    }
   }
 
   function handleProductHighlightToggle(product) {
@@ -91,16 +205,30 @@ function TableEditor({ user, tableId, tableData }) {
           (highlightedProduct) => highlightedProduct.id !== product.id
         )
       );
+
+      const highlightedProductsTemp = [];
+
+      const filteredProducts = visibleProducts.filter(
+        (highlightedProduct) => highlightedProduct.id !== product.id
+      );
+
+      highlightedProductsTemp.push(filteredProducts);
+
+      console.log("highlighted products", highlightedProductsTemp);
     } else {
       setHighlightedProducts((prevHighlightedProducts) => [
         ...prevHighlightedProducts,
         product,
       ]);
+
+      const highlightedProductsTemp = [...highlightedProducts, product];
+      console.log("highlightedProducts", highlightedProductsTemp);
     }
   }
 
   useEffect(() => {
     parseTableCards();
+    parseTablePreviewCards();
   }, [tableData]);
 
   if (tableData)
@@ -121,15 +249,15 @@ function TableEditor({ user, tableId, tableData }) {
             </div>
             <div className="pb-10 pt-5 flex items-center justify-between">
               <div className="">
-                <div><span className="text-sm text-stone-500">Editing</span></div>
-                
+                {/* <div><span className="text-sm text-stone-600">Editing</span></div> */}
+
                 <span className="font-semibold text-2xl">
                   {tableData.table_name}
                 </span>
               </div>
 
               <div className="flex items-center space-x-3">
-                <Button variant="outline">Preview in new tab</Button>
+                {/* <Button variant="outline">Preview in new tab</Button> */}
                 <Button variant="outline">Get embed code</Button>{" "}
               </div>
             </div>
@@ -152,10 +280,10 @@ function TableEditor({ user, tableId, tableData }) {
                       }}
                     />
                   </div>
-                  <div className="items-center justify-between flex pt-5">
+                  {/* <div className="items-center justify-between flex pt-5">
                     <span className="font-medium">Has free plan</span>
                     <Checkbox />
-                  </div>
+                  </div> */}
                 </div>
                 <div className="pt-5">
                   <span className="font-bold">
@@ -164,11 +292,11 @@ function TableEditor({ user, tableId, tableData }) {
                 </div>
                 {tableProducts.map((tableProduct, index) => (
                   <TableProductItem
-                  key={index}
+                    key={index}
                     tableProduct={tableProduct}
                     index={index}
                     onVisibilityToggle={() =>
-                      handleProductVisibilityToggle(tableProduct)
+                      handleProductVisibilityToggle(tableProduct, index)
                     }
                     isVisible={visibleProducts.some(
                       (visibleProduct) => visibleProduct.id === tableProduct.id
@@ -182,12 +310,13 @@ function TableEditor({ user, tableId, tableData }) {
                     )}
                     color={color}
                     onAddFeature={handleAddFeature}
+                    setPreviewTableData={setPreviewTableData}
                   />
                 ))}
               </div>
             )}
 
-            <div className="w-3/4 space-y-5">
+            <div className="w-3/4 space-y-5 h-full sticky top-10">
               <div className="flex  justify-between">
                 <span className="font-semibold">Table Preview</span>
               </div>
@@ -196,7 +325,7 @@ function TableEditor({ user, tableId, tableData }) {
                   visibleProducts.length < 1 &&
                   "Choose products to start building out your pricing table."}
               </div>
-              <div className="grid grid-cols-3 gap-5">
+              <div className="grid grid-cols-3 gap-5 pb-5">
                 {/* {visibleProducts && visibleProducts.length > 0 && visibleProducts.map((product, index) => <div>123</div>)} */}
                 {visibleProducts &&
                   visibleProducts.map((product, index) => (
@@ -210,47 +339,20 @@ function TableEditor({ user, tableId, tableData }) {
                           : "",
                       }}
                       key={product.id}
-                      className={`bg-white p-10 border rounded-2xl shadow-xl cursor-pointer rounded-xl space-y-5 `}
+                      className={`bg-white p-10 border rounded-2xl shadow-md cursor-pointer rounded-xl space-y-5 `}
                     >
                       <div>
                         <span className="truncate line-clamp-1 text-stone-600">
-                          {product.attributes.name}
+                          {product.name}
                         </span>
                       </div>
                       <div className="flex items-baseline space-x-3">
                         <span className="text-5xl font-semibold">
-                          ${product.attributes.price / 100}
+                          ${product.price / 100}
                         </span>
                         <span className="text-sm">/month</span>
                       </div>
                       <div className="space-y-3 py-5">
-                        {/* {features && features.length < 1 && (
-                          <div>
-                            <span className="text-sm text-stone-500">
-                              Features will be listed here.
-                            </span>
-                          </div>
-                        )} */}
-                        {/* <div className="space-y-3">
-                          {features &&
-                            features.length > 0 &&
-                            getFeaturesForProduct(index).map(
-                              (item, featureIndex) => (
-                                <div
-                                  key={featureIndex}
-                                  className="flex items-center space-x-2 text-stone-600 text-sm "
-                                >
-                                  <img
-                                    src="/img/tick.svg"
-                                    className="h-7 w-7"
-                                  />
-                                  <span className="text-lg">
-                                    {item.feature}
-                                  </span>
-                                </div>
-                              )
-                            )}
-                        </div> */}
 
                         {productFeatures && productFeatures.length < 1 && (
                           <span className="text-sm text-stone-600 font-light">
@@ -268,10 +370,7 @@ function TableEditor({ user, tableId, tableData }) {
                       </div>
 
                       <div className="">
-                        <Link
-                          href={product.attributes.buy_now_url}
-                          target="_blank"
-                        >
+                        <Link href={product.payment_link} target="_blank">
                           <button
                             className={`w-full py-3 rounded-xl text-white hover:opacity-89 text-lg`}
                             style={{ backgroundColor: color }}
@@ -283,12 +382,13 @@ function TableEditor({ user, tableId, tableData }) {
                     </div>
                   ))}
               </div>
-              <div className="pt-5 flex items-center justify-end">
+              <div className="pt-5 flex items-center justify-end pb-12 border-t">
                 <Button onClick={() => handleSaveTable()}>Save</Button>
               </div>
             </div>
           </div>
         </div>
+        <Toaster />
       </div>
     );
 
