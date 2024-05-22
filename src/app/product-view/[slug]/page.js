@@ -73,7 +73,12 @@ function ProductDetails({ params }) {
   if (!product) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <div className="font-semibold">Loading...</div>
+        <div className="space-y-3 text-center">
+          <div>
+          <span className="font-semibold text-xl text-sm">Loading...</span>
+        </div>
+        </div>
+        
       </div>
     );
   }
@@ -87,7 +92,7 @@ function ProductDetails({ params }) {
             <img
               src={product.productLogo ? urlFor(product.productLogo) : null}
               alt={product.productName}
-              className="h-24 w-24 rounded-xl bg-stone-200 border"
+              className="h-24 w-24 rounded-xl bg-stone-200 border object-cover"
             />
             <div>
               <div>

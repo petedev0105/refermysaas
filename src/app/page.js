@@ -94,12 +94,12 @@ export default function Home() {
       <div className="lg:pt-24 pt-12 space-y-7 lg:px-0 px-5 max-w-6xl mx-auto">
         <div className="max-w-3xl">
           <span className="lg:text-5xl text-3xl font-bold max-w-3xl text-center">
-            Find affiliate programs that make you money
+            The best-selling SaaS affiliate programs that make you money
           </span>
         </div>
         <div className="max-w-2xl">
           <span className="text-center text-xl">
-            Monetize your content through affiliate programs from top indie SaaS companies and generate a side income, fast.
+            Monetize your content through affiliate programs from top SaaS companies and generate a side income, fast.
           </span>
         </div>
         <div className="">
@@ -117,7 +117,7 @@ export default function Home() {
           <div>
             <span className="font-semibold">Categories</span>
           </div>
-          <div className="flex flex-wrap gap-3 items-center">
+          <div className="lg:flex flex-wrap gap-3 items-center hidden">
             <button
               className={`px-5 py-2 border rounded-full hover:bg-stone-200 outline-none ${
                 selectedCategory === null && "bg-stone-200"
@@ -126,7 +126,7 @@ export default function Home() {
             >
               All
             </button>
-            {productCategories.length > 0 &&
+              {productCategories.length > 0 &&
               productCategories.map((category, index) => (
                 <button
                 key={index}
@@ -138,6 +138,7 @@ export default function Home() {
                   {category}
                 </button>
               ))}
+            
           </div>
           <div className="w-full px-5 py-3 rounded-full outline-none flex items-center justify-between bg-stone-100">
             <input
