@@ -106,7 +106,7 @@ export default function Home() {
           <Link href="https://tally.so/r/npLgoE" target="_blank">
             <button className="px-5 py-2 bg-black text-white rounded-full hover:opacity-85 flex items-center space-x-2">
               <div className="rounded-full bg-green-400 h-2 w-2"></div>
-              <span>Submit Product +</span>
+              <span>Submit Product - It&apos;s free</span>
             </button>
           </Link>
         </div>
