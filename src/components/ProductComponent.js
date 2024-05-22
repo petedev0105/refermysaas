@@ -16,12 +16,12 @@ function ProductComponent({ product }) {
   return (
     <div>
       <Link href={`/product-view/${currentSlug}`}>
-        <div className="rounded-lg border p-3 space-y-5 hover:border-black cursor-pointer">
+        <div className="rounded-xl border p-3 space-y-5 hover:bg-stone-50 cursor-pointer">
           <div className="flex space-x-3">
             <img
               src={productLogo ? urlFor(productLogo) : null}
               alt={productName}
-              className="h-12 w-12 rounded-md bg-stone-200 border"
+              className="h-12 w-12 rounded-md bg-stone-200 border object-cover"
             />
 
             {/* <Image
@@ -47,7 +47,7 @@ function ProductComponent({ product }) {
                 {productCategory && productCategory.join(" | ")}
               </span>
             </div>
-            <div className="px-3 py-1 rounded-full flex justify-center bg-stone-100 border">
+            <div className="px-3 py-1 rounded-full flex justify-center bg-black text-white">
               <span className="text-xs">{productCommission}%</span>
             </div>
           </div>

@@ -14,6 +14,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sanityData, setSanityData] = useState([]);
+  const [productCategories, setProductCategories] = useState([]);
 
   async function fetchSanityData() {
     const query = `
@@ -31,35 +32,54 @@ export default function Home() {
     }
   }
 
-  async function fetchProducts() {
-    try {
-      const { data, error } = await supabase.from("products").select("*");
+  async function fetchProductCategories() {
+    const query = `
+    *[_type == 'product'] {
+      productCategory
+    }
 
-      if (error) {
-        throw error;
-      }
+    `;
+    const data = await client.fetch(query);
 
+    if (data) {
       console.log(data);
 
-      setProducts(data);
-    } catch (error) {
-      console.error("Error fetching products:", error.message);
+      let allCategories = [];
+      data.forEach((item) => {
+        // Extract the productCategory array from each object
+        const categories = item.productCategory;
+
+        // Add each category to the allCategories array
+        allCategories.push(...categories);
+        const uniqueCategories = [...new Set(allCategories)];
+        console.log(uniqueCategories);
+
+        setProductCategories(uniqueCategories);
+      });
     }
   }
 
   useEffect(() => {
-    fetchProducts();
+    fetchProductCategories();
     fetchSanityData();
   }, []);
 
   // Filter products based on the search query and selected category
   const filteredProducts = sanityData.filter((product) => {
     const matchesSearchQuery =
-      product.productName && product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.productSlogan && product.productSlogan.toLowerCase().includes(searchQuery.toLowerCase());
+      (product.productName &&
+        product.productName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      (product.productSlogan &&
+        product.productSlogan
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()));
 
     const matchesCategory =
-      !selectedCategory || product.productCategory && product.productCategory.includes(selectedCategory);
+      !selectedCategory ||
+      (product.productCategory &&
+        product.productCategory.includes(selectedCategory));
 
     return matchesSearchQuery && matchesCategory;
   });
@@ -79,16 +99,15 @@ export default function Home() {
         </div>
         <div className="flex items-center justify-center max-w-6xl mx-auto">
           <span className="max-w-3xl text-center text-xl">
-            Recuit the right affiliates for your platform and watch your revenue
-            soar.
+            Recruit the right affiliates for your platform and watch your
+            revenue soar.
           </span>
         </div>
         <div className="flex items-center space-x-5 flex justify-center">
-        <Link href="https://tally.so/r/npLgoE" target="_blank">
+          <Link href="https://tally.so/r/npLgoE" target="_blank">
             <button className="px-5 py-2 bg-black text-white rounded-full hover:opacity-85 flex items-center space-x-2">
-            <div className="rounded-full bg-green-400 h-2 w-2"></div>
+              <div className="rounded-full bg-green-400 h-2 w-2"></div>
               <span>Submit Product +</span>
-              
             </button>
           </Link>
         </div>
@@ -108,43 +127,22 @@ export default function Home() {
             >
               All
             </button>
-            <button
-              className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                selectedCategory === "SaaS" && "bg-stone-100 border-black"
-              }`}
-              onClick={() => handleCategoryFilter("SaaS")}
-            >
-              SaaS
-            </button>
-            <button
-              className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                selectedCategory === "AI" && "bg-stone-100 border-black"
-              }`}
-              onClick={() => handleCategoryFilter("AI")}
-            >
-              AI
-            </button>
-            <button
-              className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                selectedCategory === "Education" && "bg-stone-100 border-black"
-              }`}
-              onClick={() => handleCategoryFilter("Education")}
-            >
-              Education
-            </button>
-            <button
-              className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                selectedCategory === "Boilerplates" &&
-                "bg-stone-100 border-black"
-              }`}
-              onClick={() => handleCategoryFilter("Boilerplates")}
-            >
-              Boilerplates
-            </button>
+            {productCategories.length > 0 &&
+              productCategories.map((category, index) => (
+                <button
+                key={index}
+                  className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
+                    selectedCategory === category && "bg-stone-100 border-black"
+                  }`}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
           </div>
-          <div className="w-full px-5 py-3 border shadow-sm rounded-full outline-none flex items-center justify-between">
+          <div className="w-full px-5 py-3 border shadow-sm rounded-full outline-none flex items-center justify-between bg-stone-50">
             <input
-              className="w-full outline-none"
+              className="w-full outline-none bg-stone-50"
               placeholder="Search for products to earn commission with..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
