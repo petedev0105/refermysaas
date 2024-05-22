@@ -120,11 +120,11 @@ function ProductDetails({ params }) {
           </div>
         </div>
         <div className="flex items-center space-x-3 pt-5">
-          <button className="rounded-full px-5 py-2 border flex space-x-1 items-center bg-stone-50">
+          <button className="rounded-full px-5 py-2 flex space-x-1 items-center bg-green-100 text-green-600 font-medium">
             <span>{product.productCommission}% Commission</span>
           </button>
           <div>
-            <span>{product.productCategory.join(" | ")}</span>
+            <span>{product.productCategory.join(", ")}</span>
           </div>
         </div>
         <div className="pt-12 space-y-3">

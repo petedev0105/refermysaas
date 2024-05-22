@@ -91,19 +91,18 @@ export default function Home() {
   return (
     <main className="pb-10 h-screen">
       <Header />
-      <div className="lg:pt-24 pt-12 space-y-7 lg:px-0 px-5">
-        <div className="flex items-center justify-center max-w-6xl mx-auto">
-          <span className="lg:text-5xl text-3xl font-semibold max-w-3xl text-center">
-            We help SaaS founders grow revenue through affiliates
+      <div className="lg:pt-24 pt-12 space-y-7 lg:px-0 px-5 max-w-6xl mx-auto">
+        <div className="max-w-3xl">
+          <span className="lg:text-5xl text-3xl font-bold max-w-3xl text-center">
+            Find affiliate programs that make you money
           </span>
         </div>
-        <div className="flex items-center justify-center max-w-6xl mx-auto">
-          <span className="max-w-3xl text-center text-xl">
-            Recruit the right affiliates for your platform and watch your
-            revenue soar.
+        <div className="max-w-2xl">
+          <span className="text-center text-xl">
+            Monetize your content through affiliate programs from top indie SaaS companies and generate a side income, fast.
           </span>
         </div>
-        <div className="flex items-center space-x-5 flex justify-center">
+        <div className="">
           <Link href="https://tally.so/r/npLgoE" target="_blank">
             <button className="px-5 py-2 bg-black text-white rounded-full hover:opacity-85 flex items-center space-x-2">
               <div className="rounded-full bg-green-400 h-2 w-2"></div>
@@ -120,8 +119,8 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-3 items-center">
             <button
-              className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                selectedCategory === null && "bg-stone-100 border-black"
+              className={`px-5 py-2 border rounded-full hover:bg-stone-200 outline-none ${
+                selectedCategory === null && "bg-stone-200"
               }`}
               onClick={() => setSelectedCategory(null)}
             >
@@ -131,8 +130,8 @@ export default function Home() {
               productCategories.map((category, index) => (
                 <button
                 key={index}
-                  className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                    selectedCategory === category && "bg-stone-100 border-black"
+                  className={`px-5 py-2 border rounded-full hover:bg-stone-200 outline-none ${
+                    selectedCategory === category && "bg-stone-200"
                   }`}
                   onClick={() => setSelectedCategory(category)}
                 >
@@ -140,9 +139,9 @@ export default function Home() {
                 </button>
               ))}
           </div>
-          <div className="w-full px-5 py-3 border shadow-sm rounded-full outline-none flex items-center justify-between bg-stone-50">
+          <div className="w-full px-5 py-3 rounded-full outline-none flex items-center justify-between bg-stone-100">
             <input
-              className="w-full outline-none bg-stone-50"
+              className="w-full outline-none bg-stone-100"
               placeholder="Search for products to earn commission with..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

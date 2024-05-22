@@ -20,7 +20,7 @@ function Header() {
         <div className="flex items-center space-x-2">
           <div className="rounded-full bg-green-400 h-2 w-2"></div>
           <div>
-            <span className="text-sm text-stone-500">100 free spots left</span>
+            <span className="text-sm text-stone-500">98 free spots left</span>
           </div>
         </div>
       </div>
