@@ -7,11 +7,29 @@ import Link from "next/link";
 import ProductComponent from "@/components/ProductComponent";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
+import { client } from "@/lib/sanity";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [sanityData, setSanityData] = useState([]);
+
+  async function fetchSanityData() {
+    const query = `
+  *[_type == 'product'] | order(_createdAt desc) {
+    productName, 
+    productLogo, 
+      "currentSlug": slug.current, productSlogan, productCategory,
+      productCommission
+  }`;
+    const data = await client.fetch(query);
+
+    if (data && data.length > 0) {
+      console.log(data);
+      setSanityData(data);
+    }
+  }
 
   async function fetchProducts() {
     try {
@@ -31,21 +49,17 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts();
+    fetchSanityData();
   }, []);
 
   // Filter products based on the search query and selected category
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = sanityData.filter((product) => {
     const matchesSearchQuery =
-      product.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.product_slogan
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      product.product_description
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+      product.productName && product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.productSlogan && product.productSlogan.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesCategory =
-      !selectedCategory || product.product_category.includes(selectedCategory);
+      !selectedCategory || product.productCategory && product.productCategory.includes(selectedCategory);
 
     return matchesSearchQuery && matchesCategory;
   });
@@ -70,9 +84,11 @@ export default function Home() {
           </span>
         </div>
         <div className="flex items-center space-x-5 flex justify-center">
-          <Link href="https://tally.so/r/npLgoE" target="_blank">
-            <button className="px-5 py-3 bg-black text-white rounded-full hover:opacity-85">
-              Submit Product +
+        <Link href="https://tally.so/r/npLgoE" target="_blank">
+            <button className="px-5 py-2 bg-black text-white rounded-full hover:opacity-85 flex items-center space-x-2">
+            <div className="rounded-full bg-green-400 h-2 w-2"></div>
+              <span>Submit Product +</span>
+              
             </button>
           </Link>
         </div>
@@ -83,7 +99,7 @@ export default function Home() {
           <div>
             <span className="font-semibold">Categories</span>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap gap-3 items-center">
             <button
               className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
                 selectedCategory === null && "bg-stone-100 border-black"
@@ -118,14 +134,15 @@ export default function Home() {
             </button>
             <button
               className={`px-5 py-2 border rounded-full hover:bg-stone-50 outline-none ${
-                selectedCategory === "Boilerplates" && "bg-stone-100 border-black"
+                selectedCategory === "Boilerplates" &&
+                "bg-stone-100 border-black"
               }`}
               onClick={() => handleCategoryFilter("Boilerplates")}
             >
               Boilerplates
             </button>
           </div>
-          <div className="w-full px-5 py-3 border rounded-full outline-none flex items-center justify-between">
+          <div className="w-full px-5 py-3 border shadow-sm rounded-full outline-none flex items-center justify-between">
             <input
               className="w-full outline-none"
               placeholder="Search for products to earn commission with..."
