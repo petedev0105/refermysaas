@@ -1,10 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
-import supabase from "@/utils/supabase";
 import Link from "next/link";
-import ProductComponent from "@/components/ProductComponent"; // Assuming you have a ProductComponent for displaying products
-import sanityClient from "@sanity/client";
+import ProductComponent from "@/components/ProductComponent";
 import { client, urlFor } from "@/lib/sanity";
 
 function ProductDetails({ params }) {
@@ -39,14 +37,17 @@ function ProductDetails({ params }) {
   async function fetchAlternativeProducts(category) {
     try {
       const query = `
-      *[_type == 'product' && $category in productCategory && slug.current != $slug] {
+      *[_type == 'product' && (
+        $category in productCategory[] || 
+        $category == productCategory
+      ) && slug.current != $slug] {
         productName,
         productLogo,
         "currentSlug": slug.current,
         productSlogan,
         productCategory,
         productCommission
-      } | order(_createdAt desc)[0...5]`; // Limit to 5 alternative products
+      } | order(_createdAt desc)[0...5]`;
       const data = await client.fetch(query, { category, slug });
 
       if (data) {
@@ -64,9 +65,11 @@ function ProductDetails({ params }) {
   }, [slug]);
 
   useEffect(() => {
-    if (product && product.productCategory.length > 0) {
-      // Fetch alternative products based on the first category of the current product
-      fetchAlternativeProducts(product.productCategory[0]);
+    if (product && product.productCategory) {
+      const category = Array.isArray(product.productCategory) 
+        ? product.productCategory[0] 
+        : product.productCategory;
+      fetchAlternativeProducts(category);
     }
   }, [product]);
 
@@ -75,10 +78,9 @@ function ProductDetails({ params }) {
       <div className="h-screen flex items-center justify-center">
         <div className="space-y-3 text-center">
           <div>
-          <span className="font-semibold text-xl text-sm">Loading...</span>
+            <span className="font-semibold text-xl text-sm">Loading...</span>
+          </div>
         </div>
-        </div>
-        
       </div>
     );
   }
@@ -112,7 +114,7 @@ function ProductDetails({ params }) {
               className="rounded-full text-sm px-5 py-2 border flex space-x-1 items-center hover:bg-stone-50"
             >
               <span>{product.productWebsiteLink}</span>
-              <img src="/img/to-dark.svg" />
+              <img src="/img/to-dark.svg" alt="External link" />
             </Link>
             <Link
               target="_blank"
@@ -120,7 +122,7 @@ function ProductDetails({ params }) {
               className="bg-black text-white rounded-full text-sm px-5 py-2 flex space-x-1 items-center hover:opacity-85"
             >
               <span>Apply to affiliate program</span>
-              <img src="/img/to-light.svg" />
+              <img src="/img/to-light.svg" alt="External link" />
             </Link>
           </div>
         </div>
@@ -129,7 +131,11 @@ function ProductDetails({ params }) {
             <span>{product.productCommission}% Commission</span>
           </button>
           <div>
-            <span>{product.productCategory.join(", ")}</span>
+            <span>
+              {Array.isArray(product.productCategory) 
+                ? product.productCategory.join(", ") 
+                : product.productCategory || "No categories"}
+            </span>
           </div>
         </div>
         <div className="pt-12 space-y-3">
@@ -152,7 +158,7 @@ function ProductDetails({ params }) {
         <div className="lg:grid grid-cols-3 gap-5 lg:space-y-0 space-y-3">
           {alternativeProducts.length > 0 ? (
             alternativeProducts.map((altProduct) => (
-              <ProductComponent key={altProduct.id} product={altProduct} />
+              <ProductComponent key={altProduct.currentSlug} product={altProduct} />
             ))
           ) : (
             <div>No alternative products found</div>

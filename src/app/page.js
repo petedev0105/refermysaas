@@ -49,13 +49,21 @@ export default function Home() {
         // Extract the productCategory array from each object
         const categories = item.productCategory;
 
-        // Add each category to the allCategories array
-        allCategories.push(...categories);
-        const uniqueCategories = [...new Set(allCategories)];
-        console.log(uniqueCategories);
-
-        setProductCategories(uniqueCategories);
+        // Check if categories is an array before spreading
+        if (Array.isArray(categories)) {
+          // Add each category to the allCategories array
+          allCategories.push(...categories);
+        } else if (categories) {
+          // If it's not null/undefined but also not an array, add it as is
+          allCategories.push(categories);
+        }
+        // If categories is null/undefined, we don't add anything
       });
+
+      // Move these outside the forEach loop
+      const uniqueCategories = [...new Set(allCategories)];
+      console.log(uniqueCategories);
+      setProductCategories(uniqueCategories);
     }
   }
 
@@ -99,16 +107,21 @@ export default function Home() {
         </div>
         <div className="max-w-2xl">
           <span className="text-center text-xl">
-            Monetize your content through affiliate programs from top SaaS companies and generate a side income, fast.
+            Monetize your content through affiliate programs from top SaaS
+            companies and generate a side income, fast.
           </span>
         </div>
         <div className="">
-          <Link href="https://tally.so/r/npLgoE" target="_blank">
-            <button className="px-5 py-2 bg-black text-white rounded-full hover:opacity-85 flex items-center space-x-2">
+          <button>
+            <Link
+              href="/submit"
+              target="_blank"
+              className="px-5 py-2 bg-black text-white rounded-full hover:opacity-85 flex items-center space-x-2"
+            >
               <div className="rounded-full bg-green-400 h-2 w-2"></div>
-              <span>Submit Product - It&apos;s free</span>
-            </button>
-          </Link>
+              <span>Submit Product - It&apos;s free</span>{" "}
+            </Link>
+          </button>
         </div>
         <div className="max-w-6xl mx-auto py-7 pt-24 space-y-5">
           <div>
@@ -126,10 +139,10 @@ export default function Home() {
             >
               All
             </button>
-              {productCategories.length > 0 &&
+            {productCategories.length > 0 &&
               productCategories.map((category, index) => (
                 <button
-                key={index}
+                  key={index}
                   className={`px-5 py-2 border rounded-full hover:bg-stone-200 outline-none ${
                     selectedCategory === category && "bg-stone-200"
                   }`}
@@ -138,7 +151,6 @@ export default function Home() {
                   {category}
                 </button>
               ))}
-            
           </div>
           <div className="w-full px-5 py-3 rounded-full outline-none flex items-center justify-between bg-stone-100">
             <input
